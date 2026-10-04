@@ -50,8 +50,14 @@
 
             <div class="collapse navbar-collapse" id="navTk">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('landing') }}">Beranda</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('products') }}">Katalog</a></li>
+                    @if (auth()->user()?->is_admin)
+                        <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('admin.products') }}">Produk</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('admin.orders') }}">Pesanan</a></li>
+                    @else
+                        <li class="nav-item"><a class="nav-link" href="{{ route('landing') }}">Beranda</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('products') }}">Katalog</a></li>
+                    @endif
                 </ul>
 
                 <ul class="navbar-nav ms-auto align-items-md-center">

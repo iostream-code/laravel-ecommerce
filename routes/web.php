@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'orders'])->name('orders');
     Route::get('/order/{order}', [OrderController::class, 'detailOrder'])->name('detail_order');
     Route::post('/order/{order}/pay', [OrderController::class, 'submitPayment'])->name('submit_payment');
+    Route::get('/order/{order}/bukti', [OrderController::class, 'buktiBayar'])->name('bukti_bayar');
 
     Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
     Route::get('/profile/{user}/edit', [ProfileController::class, 'editProfile'])->name('edit_profile');

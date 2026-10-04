@@ -57,4 +57,26 @@ class StoreTest extends TestCase
     {
         $this->get('/cart')->assertRedirect('/login');
     }
+
+    public function test_bukti_bayar_hanya_untuk_pemilik_dan_admin(): void
+    {
+        $pembeli = User::where('email', 'budi@demo.test')->first();
+        $admin = User::where('email', 'admin@demo.test')->first();
+        $lain = User::create([
+            'name' => 'Orang Lain', 'email' => 'lain@demo.test',
+            'password' => bcrypt('password123'),
+        ]);
+
+        \Illuminate\Support\Facades\Storage::fake('local');
+        \Illuminate\Support\Facades\Storage::disk('local')->put('bukti-bayar/tes.png', 'isi');
+
+        $order = $pembeli->orders()->create([
+            'status' => 'menunggu_verifikasi', 'total' => 1000,
+            'payment_receipt' => 'bukti-bayar/tes.png',
+        ]);
+
+        $this->actingAs($lain)->get("/order/{$order->id}/bukti")->assertForbidden();
+        $this->actingAs($pembeli)->get("/order/{$order->id}/bukti")->assertOk();
+        $this->actingAs($admin)->get("/order/{$order->id}/bukti")->assertOk();
+    }
 }

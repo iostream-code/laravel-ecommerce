@@ -45,8 +45,8 @@
             @if ($order->payment_receipt)
                 <div class="card p-4 mb-4">
                     <h2 class="h6 fw-bold text-uppercase text-muted mb-3">Bukti Pembayaran</h2>
-                    <a href="{{ asset('storage/' . $order->payment_receipt) }}" target="_blank">
-                        <img src="{{ asset('storage/' . $order->payment_receipt) }}" class="img-fluid rounded-3" alt="Bukti bayar">
+                    <a href="{{ route('bukti_bayar', $order) }}" target="_blank">
+                        <img src="{{ route('bukti_bayar', $order) }}" class="img-fluid rounded-3" alt="Bukti bayar">
                     </a>
                 </div>
             @endif

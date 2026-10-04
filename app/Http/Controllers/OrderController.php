@@ -128,13 +128,30 @@ class OrderController extends Controller
             'payment_receipt' => 'required|image|max:4096',
         ]);
 
-        $path = $req->file('payment_receipt')->store('bukti-bayar', 'public');
+        // Disimpan di disk privat; diakses lewat route ber-otorisasi,
+        // sehingga tidak butuh storage:link dan tidak terbuka untuk publik.
+        $path = $req->file('payment_receipt')->store('bukti-bayar');
         $order->update([
             'payment_receipt' => $path,
             'status' => 'menunggu_verifikasi',
         ]);
 
         return Redirect::back()->with('success', 'Bukti pembayaran terkirim, menunggu verifikasi admin.');
+    }
+
+    /** Tampilkan bukti pembayaran (pemilik pesanan atau admin saja). */
+    public function buktiBayar(Order $order)
+    {
+        abort_unless($order->user_id === Auth::id() || Auth::user()->is_admin, 403);
+        abort_unless($order->payment_receipt, 404);
+
+        // Dukung file lama yang tersimpan di disk public
+        foreach (['local', 'public'] as $disk) {
+            if (\Illuminate\Support\Facades\Storage::disk($disk)->exists($order->payment_receipt)) {
+                return \Illuminate\Support\Facades\Storage::disk($disk)->response($order->payment_receipt);
+            }
+        }
+        abort(404);
     }
 
     /** Webhook notifikasi Midtrans (tanpa CSRF). */
