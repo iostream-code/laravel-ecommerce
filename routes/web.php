@@ -1,58 +1,59 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Admin;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StorefrontController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-Route::get('/', function () {
-    return view('welcome');
-});
+// ---------- Storefront (publik) ----------
+Route::get('/', [StorefrontController::class, 'landing'])->name('landing');
+Route::get('/katalog', [StorefrontController::class, 'catalog'])->name('products');
+Route::get('/produk/{product:slug}', [StorefrontController::class, 'show'])->name('product');
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Setelah login, arahkan sesuai role
+Route::get('/home', function () {
+    return auth()->user()?->is_admin
+        ? redirect()->route('admin.dashboard')
+        : redirect()->route('products');
+})->name('home');
 
-// Product Route
-Route::get('/product/create', [ProductController::class, 'createProduct'])->name('create_product');
-Route::post('/product/create', [ProductController::class, 'storeProduct'])->name('store_product');
+// ---------- Pembeli (login) ----------
+Route::middleware('auth')->group(function () {
+    Route::post('/cart/{product:slug}', [CartController::class, 'addToCart'])->name('add_to_cart');
+    Route::get('/cart', [CartController::class, 'showCart'])->name('cart');
+    Route::patch('/cart/{cart}', [CartController::class, 'updateCart'])->name('update_cart');
+    Route::delete('/cart/{cart}', [CartController::class, 'deleteCart'])->name('delete_cart');
 
-Route::get('/products', [ProductController::class, 'showProducts'])->name('products');
-Route::get('/product/{product}', [ProductController::class, 'detailProduct'])->name('product');
+    Route::get('/checkout', [OrderController::class, 'checkoutForm'])->name('checkout_form');
+    Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+    Route::get('/orders', [OrderController::class, 'orders'])->name('orders');
+    Route::get('/order/{order}', [OrderController::class, 'detailOrder'])->name('detail_order');
+    Route::post('/order/{order}/pay', [OrderController::class, 'submitPayment'])->name('submit_payment');
 
-Route::get('/product/{product}/edit', [ProductController::class, 'editProduct'])->name('edit_product');
-Route::patch('/product/{product}/update', [ProductController::class, 'updateProduct'])->name('update_product');
+    Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
+    Route::get('/profile/{user}/edit', [ProfileController::class, 'editProfile'])->name('edit_profile');
+});
 
-Route::delete('/products/{product}', [ProductController::class, 'deleteProduct'])->name('delete_product');
+// ---------- Webhook Midtrans (tanpa auth & CSRF) ----------
+Route::post('/midtrans/callback', [OrderController::class, 'midtransCallback'])->name('midtrans_callback');
 
-// Cart Route
-Route::post('/cart/{product}', [CartController::class, 'addToCart'])->name('add_to_cart');
-Route::get('/cart', [CartController::class, 'showCart'])->name('cart');
-Route::patch('/cart/{cart}', [CartController::class, 'updateCart'])->name('update_cart');
-Route::delete('/cart/{cart}', [CartController::class, 'deleteCart'])->name('delete_cart');
+// ---------- Admin ----------
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [Admin\DashboardController::class, 'index'])->name('dashboard');
 
-//Order Route
-Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
-Route::get('/orders', [OrderController::class, 'orders'])->name('orders');
-Route::get('/order/{order}', [OrderController::class, 'detailOrder'])->name('detail_order');
-Route::post('/order/{order}/pay', [OrderController::class, 'submitPayment'])->name('submit_payment');
-Route::post('/order/{order}/confirm', [OrderController::class, 'confirmPayment'])->name('confirm_payment');
+    Route::get('/produk', [Admin\ProductController::class, 'index'])->name('products');
+    Route::get('/produk/tambah', [Admin\ProductController::class, 'create'])->name('products.create');
+    Route::post('/produk', [Admin\ProductController::class, 'store'])->name('products.store');
+    Route::get('/produk/{product:slug}/edit', [Admin\ProductController::class, 'edit'])->name('products.edit');
+    Route::patch('/produk/{product:slug}', [Admin\ProductController::class, 'update'])->name('products.update');
+    Route::delete('/produk/{product:slug}', [Admin\ProductController::class, 'destroy'])->name('products.destroy');
 
-//Profile Route
-Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
-Route::get('/profile/{user}/edit', [ProfileController::class, 'editProfile'])->name('edit_profile');
-Route::patch('/profile/{user}/update', [ProfileController::class, 'updateProfile'])->name('update_profile');
+    Route::get('/pesanan', [Admin\OrderController::class, 'index'])->name('orders');
+    Route::get('/pesanan/{order}', [Admin\OrderController::class, 'show'])->name('orders.show');
+    Route::patch('/pesanan/{order}/status', [Admin\OrderController::class, 'updateStatus'])->name('orders.status');
+});
