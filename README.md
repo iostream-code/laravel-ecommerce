@@ -19,8 +19,8 @@ Platform e-commerce berbasis **Laravel 12** — katalog produk, keranjang belanj
 ## Instalasi
 
 ```bash
-git clone https://github.com/iostream-code/laravel-9-ecommerce.git
-cd laravel-9-ecommerce
+git clone https://github.com/iostream-code/laravel-ecommerce.git
+cd laravel-ecommerce
 composer install
 npm install && npm run build
 
@@ -36,4 +36,4 @@ Buka http://localhost:8000
 
 ## Riwayat
 
-Dibangun tahun 2023 dengan Laravel 9 (asal nama repo); dipugar ke **Laravel 12** (Oktober 2026) — `fruitcake/laravel-cors` digantikan middleware CORS bawaan framework, sisa Laravel Mix dibersihkan (full Vite), kompatibel PHP 8.2–8.5, migrasi & test terverifikasi.
+Dibangun tahun 2023 dengan Laravel 9 (nama repo semula: laravel-9-ecommerce); dipugar ke **Laravel 12** (Oktober 2026) — `fruitcake/laravel-cors` digantikan middleware CORS bawaan framework, sisa Laravel Mix dibersihkan (full Vite), kompatibel PHP 8.2–8.5, migrasi & test terverifikasi.
