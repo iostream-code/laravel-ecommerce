@@ -79,4 +79,22 @@ class StoreTest extends TestCase
         $this->actingAs($pembeli)->get("/order/{$order->id}/bukti")->assertOk();
         $this->actingAs($admin)->get("/order/{$order->id}/bukti")->assertOk();
     }
+
+    public function test_bukti_bayar_dikonversi_ke_webp(): void
+    {
+        $pembeli = User::where('email', 'budi@demo.test')->first();
+        $order = $pembeli->orders()->create(['status' => 'menunggu_pembayaran', 'total' => 1000]);
+
+        \Illuminate\Support\Facades\Storage::fake('local');
+        $file = \Illuminate\Http\UploadedFile::fake()->image('bukti.jpg', 800, 600);
+
+        $this->actingAs($pembeli)
+            ->post("/order/{$order->id}/pay", ['payment_receipt' => $file])
+            ->assertRedirect();
+
+        $order->refresh();
+        $this->assertStringEndsWith('.webp', $order->payment_receipt);
+        \Illuminate\Support\Facades\Storage::disk('local')->assertExists($order->payment_receipt);
+        $this->assertSame('menunggu_verifikasi', $order->status);
+    }
 }

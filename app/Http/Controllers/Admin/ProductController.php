@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use App\Support\Webp;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -31,7 +32,7 @@ class ProductController extends Controller
     public function store(Request $req)
     {
         $data = $this->validasi($req, wajibGambar: true);
-        $data['image'] = $req->file('image')->store('produk', 'public');
+        $data['image'] = Webp::simpan($req->file('image'), 'produk');
         Product::create($data);
 
         return Redirect::route('admin.products')->with('success', 'Produk ditambahkan.');
@@ -50,7 +51,7 @@ class ProductController extends Controller
             if ($product->image && !str_starts_with($product->image, 'http')) {
                 Storage::disk('public')->delete($product->image);
             }
-            $data['image'] = $req->file('image')->store('produk', 'public');
+            $data['image'] = Webp::simpan($req->file('image'), 'produk');
         }
         $product->update($data);
 

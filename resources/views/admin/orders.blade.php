@@ -21,7 +21,7 @@
         <div class="table-responsive">
             <table class="table align-middle mb-0">
                 <thead class="table-light"><tr class="small text-uppercase text-muted">
-                    <th class="ps-3">#</th><th>Pelanggan</th><th>Tanggal</th><th>Item</th><th>Total</th><th>Metode</th><th class="pe-3">Status</th>
+                    <th class="ps-3">#</th><th>Pelanggan</th><th>Tanggal</th><th>Item</th><th>Total</th><th>Metode</th><th>Status</th><th class="text-end pe-3">Aksi</th>
                 </tr></thead>
                 <tbody>
                     @forelse ($orders as $order)
@@ -36,10 +36,15 @@
                             <td>{{ $order->transactions_count }}</td>
                             <td>Rp{{ number_format($order->total, 0, ',', '.') }}</td>
                             <td><small class="text-uppercase fw-semibold">{{ $order->payment_method }}</small></td>
-                            <td class="pe-3"><span class="badge text-bg-{{ $order->status_color }}">{{ $order->status_label }}</span></td>
+                            <td><span class="badge text-bg-{{ $order->status_color }}">{{ $order->status_label }}</span></td>
+                            <td class="text-end pe-3">
+                                <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-tk">
+                                    <i class="bi bi-eye me-1"></i>Detail
+                                </a>
+                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="text-center text-muted py-4">Tidak ada pesanan.</td></tr>
+                        <tr><td colspan="8" class="text-center text-muted py-4">Tidak ada pesanan.</td></tr>
                     @endforelse
                 </tbody>
             </table>

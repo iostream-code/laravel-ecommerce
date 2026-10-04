@@ -25,6 +25,7 @@ Platform e-commerce lengkap berbasis **Laravel 12**: storefront publik, keranjan
 
 **Pembeli**
 - Keranjang: tambah/ubah jumlah/hapus, validasi stok
+- Semua gambar upload (produk & bukti bayar) otomatis dikonversi ke **WebP** dan diperkecil
 - Checkout dengan alamat pengiriman; **stok dikurangi secara atomik** (DB transaction + row lock) dan harga dikunci saat pembelian
 - Pembayaran: **Midtrans Snap** (kartu, VA, e-wallet — sandbox) bila dikonfigurasi, otomatis fallback ke **transfer manual + upload bukti** bila tidak
 - Riwayat pesanan dengan status berjenjang: menunggu pembayaran → verifikasi → dibayar → dikirim → selesai

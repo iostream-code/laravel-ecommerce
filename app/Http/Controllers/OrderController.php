@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Services\MidtransService;
+use App\Support\Webp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -130,7 +131,7 @@ class OrderController extends Controller
 
         // Disimpan di disk privat; diakses lewat route ber-otorisasi,
         // sehingga tidak butuh storage:link dan tidak terbuka untuk publik.
-        $path = $req->file('payment_receipt')->store('bukti-bayar');
+        $path = Webp::simpan($req->file('payment_receipt'), 'bukti-bayar', disk: 'local', maxLebar: 1200);
         $order->update([
             'payment_receipt' => $path,
             'status' => 'menunggu_verifikasi',
