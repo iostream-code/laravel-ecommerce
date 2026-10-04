@@ -2,6 +2,10 @@
 
 Platform e-commerce berbasis **Laravel 12** — katalog produk, keranjang belanja, pesanan, dan transaksi dengan autentikasi pengguna.
 
+## Tampilan
+
+![Login](docs/screenshots/ecommerce-login.png)
+
 ## Fitur
 
 - **Autentikasi** — registrasi & login (Laravel UI + Bootstrap)
